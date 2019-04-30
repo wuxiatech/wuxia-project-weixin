@@ -15,7 +15,7 @@
         <wuxia-weixin-api.version>2.3.3.2</wuxia-weixin-api.version>
     </properties>
     <packaging>jar</packaging>
-
+    <url>https://github.com/wuxiatech/wuxia-project-weixin.git</url>
     <dependencies>
         <dependency>
             <groupId>cn.wuxia.project</groupId>
