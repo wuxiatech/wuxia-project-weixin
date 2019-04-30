@@ -12,7 +12,7 @@
     <name>Project Weixin</name>
     <version>${project.parent.version}</version>
     <properties>
-
+        <wuxia-weixin-api.version>2.3.3.2</wuxia-weixin-api.version>
     </properties>
     <packaging>jar</packaging>
 
