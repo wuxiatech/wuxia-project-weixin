@@ -2,13 +2,10 @@ package cn.wuxia.project.weixin.mvc.filter;
 
 import cn.wuxia.common.spring.SpringContextHolder;
 import cn.wuxia.common.util.*;
-import cn.wuxia.project.basic.core.conf.enums.PointActionEnum;
 import cn.wuxia.project.basic.core.conf.support.DTools;
 import cn.wuxia.project.basic.support.ApplicationPropertiesUtil;
 import cn.wuxia.project.basic.support.DConstants;
 import cn.wuxia.project.basic.support.LogIt;
-import cn.wuxia.project.common.security.UserContext;
-import cn.wuxia.project.common.security.UserContextUtil;
 import cn.wuxia.project.weixin.WxUserContext;
 import cn.wuxia.project.weixin.WxUserContextUtil;
 import cn.wuxia.project.weixin.api.WxAccountUtil;
@@ -87,7 +84,7 @@ public class OauthInterceptor implements HandlerInterceptor, InitializingBean {
             /**
              * 打点打开链接
              */
-            LogIt.action(PointActionEnum.open_invitation_register_url);
+            LogIt.action("open_url");
             /**
              * 如果是微信则注册
              */
@@ -293,7 +290,7 @@ public class OauthInterceptor implements HandlerInterceptor, InitializingBean {
             /**
              * 授权之后
              */
-            LogIt.action(PointActionEnum.oauth_invitation_register_url);
+            LogIt.action("oauth_register_url");
         }
 
         /**
