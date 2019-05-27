@@ -5,7 +5,8 @@ import cn.wuxia.common.util.StringUtil;
 import cn.wuxia.project.basic.mvc.annotation.ApiAuthorized;
 import cn.wuxia.project.basic.mvc.annotation.ApiAuthorizedType;
 import cn.wuxia.project.basic.mvc.controller.BaseController;
-import cn.wuxia.project.common.bean.CallbackBean;
+import cn.wuxia.project.common.api.ApiRequestBean;
+import cn.wuxia.project.common.api.ApiResponseBean;
 import cn.wuxia.project.common.support.CacheConstants;
 import cn.wuxia.project.common.support.CacheSupport;
 import cn.wuxia.project.weixin.WxUserContext;
@@ -20,6 +21,7 @@ import cn.wuxia.wechat.js.util.AuthUtil;
 import cn.wuxia.wechat.miniprogram.LoginAuthUtil;
 import cn.wuxia.wechat.miniprogram.bean.AppLoginSession;
 import cn.wuxia.wechat.open.util.ProxyJsAuthUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Controller;
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +49,13 @@ public class WxAuthController extends BaseController {
             logger.info("==========={} 忽略js预授权==========", url);
             return m;
         }
-        BasicAccount account = WxAccountUtil.getByAppid(getWxAppid());
+        BasicAccount account;
+        String appid = getWxAppid();
+        if (StringUtil.isBlank(appid)) {
+            account = WxAccountUtil.getByAppid(getWxAppid());
+        } else {
+            account = WxAccountUtil.getAccount(getPlatform());
+        }
         if (account.isAuthorizedToThird()) {
             m = ProxyJsAuthUtil.authentication(account, url);
         } else {
@@ -78,15 +85,15 @@ public class WxAuthController extends BaseController {
     @RequestMapping(value = {"/miniapp/login"}, method = RequestMethod.GET)
     @ApiAuthorized(type = ApiAuthorizedType.OPEN_TYPE)
     @ResponseBody
-    public CallbackBean login(String code) {
+    public ApiResponseBean login(String code) {
         if (StringUtil.isBlank(code)) {
-            return CallbackBean.notok("code不能为空");
+            return ApiRequestBean.notok("code不能为空");
         }
         Account account = WxAccountUtil.getByAppid(getWxAppid());
 
         try {
             AppLoginSession loginSession = LoginAuthUtil.getSession(account, code);
-            Map<String, String> map = new HashMap<String, String>(4) {
+            Map<String, Object> map = new HashMap<String, Object>(4) {
                 {
                     put("openid", loginSession.getOpenid());
                     put("sessionId", request.getSession().getId());
@@ -108,7 +115,7 @@ public class WxAuthController extends BaseController {
                     WxUserContextUtil.saveUserContext(wxUserContext);
                     map.put("role", "");
                     map.put("binded", "true");
-                }else{
+                } else {
                     map.put("role", "");
                     map.put("binded", "false");
                 }
@@ -116,9 +123,9 @@ public class WxAuthController extends BaseController {
                 map.put("role", "");
                 map.put("binded", "false");
             }
-            return CallbackBean.okJsonResult(map, false);
-        } catch (WeChatException | IOException e) {
-            return CallbackBean.notok("获取openid异常");
+            return ApiRequestBean.okJson(new JSONObject(map));
+        } catch (WeChatException e) {
+            return ApiRequestBean.notok("获取openid异常");
         }
     }
 }
