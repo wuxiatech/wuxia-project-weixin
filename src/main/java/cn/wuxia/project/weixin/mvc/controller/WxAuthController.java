@@ -1,6 +1,8 @@
 package cn.wuxia.project.weixin.mvc.controller;
 
+import cn.wuxia.common.exception.AppWebException;
 import cn.wuxia.common.spring.SpringContextHolder;
+import cn.wuxia.common.util.EncodeUtils;
 import cn.wuxia.common.util.StringUtil;
 import cn.wuxia.project.basic.mvc.annotation.ApiAuthorized;
 import cn.wuxia.project.basic.mvc.annotation.ApiAuthorizedType;
@@ -20,6 +22,8 @@ import cn.wuxia.wechat.WeChatException;
 import cn.wuxia.wechat.js.util.AuthUtil;
 import cn.wuxia.wechat.miniprogram.LoginAuthUtil;
 import cn.wuxia.wechat.miniprogram.bean.AppLoginSession;
+import cn.wuxia.wechat.oauth.bean.OAuthTokeVo;
+import cn.wuxia.wechat.oauth.util.LoginUtil;
 import cn.wuxia.wechat.open.util.ProxyJsAuthUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -30,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,5 +132,40 @@ public class WxAuthController extends BaseController {
         } catch (WeChatException e) {
             return ApiRequestBean.notok("获取openid异常");
         }
+    }
+
+    //进入绑定手机页面
+    @RequestMapping(value = "/pc/login")
+    public String bind(String callbackUrl, String code) {
+        OAuthTokeVo oauthToken = null;
+        try {
+            oauthToken = LoginUtil.authUser(WxAccountUtil.getByAppid(getWxAppid()), code);
+        } catch (WeChatException e) {
+            e.printStackTrace();
+        }
+        WxUser wxUser = null;
+        if (StringUtil.isNotBlank(oauthToken.getUnionId())) {
+            wxUser = getWxUserService().findByUnionid(oauthToken.getUnionId());
+        } else if (StringUtil.isNotBlank(oauthToken.getOpenId())) {
+            wxUser = getWxUserService().findByOpenid(oauthToken.getUnionId());
+        } else {
+            throw new AppWebException("该账号还没绑定，无法登录");
+        }
+        if (wxUser != null) {
+            WxUserContext wxUserContext = new WxUserContext(wxUser.getUid(), wxUser.getNickName(), wxUser.getMobile());
+            wxUserContext.setOpenid(wxUser.getOpenid());
+            wxUserContext.setUnionid(wxUser.getUnionid());
+            wxUserContext.setWxaccount(WxAccountUtil.getByAppid(getWxAppid()));
+            WxUserContextUtil.saveUserContext(wxUserContext);
+        }else{
+            throw new AppWebException("该账号还没绑定，无法登录");
+        }
+        try {
+            callbackUrl = new String(EncodeUtils.base64Decode(callbackUrl), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:" + callbackUrl;
     }
 }
