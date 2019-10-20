@@ -1,12 +1,7 @@
 package cn.wuxia.project.basic.test;
 
-import cn.wuxia.project.common.third.fenci.BosonUtil;
-import cn.wuxia.project.common.third.fenci.bean.NerBean;
-import cn.wuxia.common.util.JsonUtil;
-import cn.wuxia.common.util.ListUtil;
 import cn.wuxia.common.util.reflection.ReflectionUtil;
 import com.google.common.collect.Lists;
-import jodd.util.StringUtil;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -15,27 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainTest {
-
-   // @Test
-    public void name() throws Exception {
-        NerBean nerBean = BosonUtil.ner("星期一提醒我吃饭, 后天吃饭, 下周一");
-        System.out.println(JsonUtil.toFullJson(nerBean));
-
-        if (ListUtil.isNotEmpty(nerBean.getEntity())) {
-            for (List<Object> list : nerBean.getEntity()) {
-                String entity = (String) list.get(2);
-                if (StringUtil.equals(entity, "time")) {
-                    int start = (Integer) list.get(0);
-                    int end = (Integer) list.get(1);
-                    List<String> word = nerBean.getWord().subList(start, end);
-                    String time = cn.wuxia.common.util.StringUtil.join(word, "");
-                    System.out.println(time);
-
-                    System.out.println(BosonUtil.time(time));
-                }
-            }
-        }
-    }
 
     @Test
     public void getctx() {

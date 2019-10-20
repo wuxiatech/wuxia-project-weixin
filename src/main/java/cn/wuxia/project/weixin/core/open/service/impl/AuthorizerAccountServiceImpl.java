@@ -1,21 +1,30 @@
 /*
-* Created on :2014年11月11日
-* Author     :wuwenhao
-* Change History
-* Version       Date         Author           Reason
-* <Ver.No>     <date>        <who modify>       <reason>
-* Copyright 2014-2020 www.ibmall.cn All right reserved.
-*/
+ * Created on :2014年11月11日
+ * Author     :wuwenhao
+ * Change History
+ * Version       Date         Author           Reason
+ * <Ver.No>     <date>        <who modify>       <reason>
+ * Copyright 2014-2020 wuxia.tech All right reserved.
+ */
 package cn.wuxia.project.weixin.core.open.service.impl;
 
-import java.util.List;
-import java.util.Map;
-
+import cn.wuxia.common.exception.AppDaoException;
+import cn.wuxia.common.exception.AppServiceException;
+import cn.wuxia.common.util.ListUtil;
+import cn.wuxia.common.util.MapUtil;
+import cn.wuxia.common.util.reflection.ConvertUtil;
+import cn.wuxia.project.common.dao.CommonDao;
+import cn.wuxia.project.common.service.impl.CommonServiceImpl;
+import cn.wuxia.project.common.support.CacheConstants;
+import cn.wuxia.project.common.support.Constants;
+import cn.wuxia.project.weixin.core.open.dao.AuthorizerAccountDao;
 import cn.wuxia.project.weixin.core.open.entity.AuthorizerAccount;
 import cn.wuxia.project.weixin.core.open.enums.AccountServiceTypeInfoEnum;
 import cn.wuxia.project.weixin.core.open.enums.AccountStatusEnum;
 import cn.wuxia.project.weixin.core.open.enums.AccountVerifyTypeInfoEnum;
-import cn.wuxia.project.weixin.core.open.dao.AuthorizerAccountDao;
+import cn.wuxia.project.weixin.core.open.service.AuthorizerAccountService;
+import cn.wuxia.wechat.open.util.FullWebUtil;
+import cn.wuxia.wechat.open.util.ProxyOAuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,17 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import cn.wuxia.project.weixin.core.open.service.AuthorizerAccountService;
-import cn.wuxia.project.common.dao.CommonDao;
-import cn.wuxia.project.common.service.impl.CommonServiceImpl;
-import cn.wuxia.project.common.support.CacheConstants;
-import cn.wuxia.project.common.support.Constants;
-import cn.wuxia.common.exception.AppServiceException;
-import cn.wuxia.common.util.ListUtil;
-import cn.wuxia.common.util.MapUtil;
-import cn.wuxia.common.util.reflection.ConvertUtil;
-import cn.wuxia.wechat.open.util.FullWebUtil;
-import cn.wuxia.wechat.open.util.ProxyOAuthUtil;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -149,8 +149,12 @@ public class AuthorizerAccountServiceImpl extends CommonServiceImpl<AuthorizerAc
             logger.info("全网发布测试号请求授权");
             account.setCreatedBy("full web test");
         }
-
-        super.save(account);
+        try {
+            super.save(account);
+        } catch (
+                AppDaoException e) {
+            throw new AppServiceException("保存失败");
+        }
         //Cache cache =  CacheSupport.getCache(Constants.CACHED_VALUE_BASE);
         /**
          * classcn.daoming.basic.core.open.service.impl.AuthorizerAccountServiceImpl.findAuthorizerByAppidwxdc282971b0b8af0a
@@ -167,8 +171,9 @@ public class AuthorizerAccountServiceImpl extends CommonServiceImpl<AuthorizerAc
     @Override
     public AuthorizerAccount findAuthorizerByAppid(String authorizerAppid) {
         AuthorizerAccount account = authorizerDao.findUniqueBy("authorizerAppid", authorizerAppid);
-        if (account == null)
+        if (account == null) {
             logger.warn("找不到该公众号[appid={}]", authorizerAppid);
+        }
         return account;
     }
 
