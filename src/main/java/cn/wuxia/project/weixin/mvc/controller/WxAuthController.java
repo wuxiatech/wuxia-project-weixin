@@ -27,6 +27,7 @@ import cn.wuxia.wechat.oauth.util.LoginUtil;
 import cn.wuxia.wechat.open.util.ProxyJsAuthUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
+import org.nutz.lang.random.R;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -98,17 +99,33 @@ public class WxAuthController extends BaseController {
 
         try {
             AppLoginSession loginSession = LoginAuthUtil.getSession(account, code);
+            String authKey = R.UU32();
             Map<String, Object> map = new HashMap<String, Object>(4) {
                 {
+                    /**
+                     * 后期不再返回openid及sessionId
+                     * 放弃本方法
+                     */
                     put("openid", loginSession.getOpenid());
                     put("sessionId", request.getSession().getId());
+                    /**
+                     * 使用auth_key代替
+                     */
+                    put("auth_key", authKey);
                 }
             };
             /**
              * session_key 不能开放到小程序中，及第三方应用
              */
             if (sessionCache != null) {
+                /**
+                 * 改方法后期不再使用
+                 */
                 CacheSupport.set(sessionCache, "SESSIONKEY:" + loginSession.getOpenid(), loginSession);
+                /**
+                 * 代替为本方法，不再透明openid到客户端
+                 */
+                CacheSupport.set(sessionCache, "SESSIONKEY:" + authKey, loginSession);
             }
             if (getWxUserService() != null) {
                 WxUser wxUser = getWxUserService().findByOpenid(loginSession.getOpenid());

@@ -1,26 +1,27 @@
 /*
-* Created on :2018年2月12日
-* Author     :songlin
-* Change History
-* Version       Date         Author           Reason
-* <Ver.No>     <date>        <who modify>       <reason>
-* Copyright 2014-2020 wuxia.gd.cn All right reserved.
-*/
+ * Created on :2018年2月12日
+ * Author     :songlin
+ * Change History
+ * Version       Date         Author           Reason
+ * <Ver.No>     <date>        <who modify>       <reason>
+ * Copyright 2014-2020 wuxia.gd.cn All right reserved.
+ */
 package cn.wuxia.project.weixin.message.bean;
-
-import java.util.LinkedList;
 
 import cn.wuxia.common.exception.ValidateException;
 import cn.wuxia.common.util.ListUtil;
+import cn.wuxia.common.validator.ValidationEntity;
+import cn.wuxia.project.common.bean.SimpleFieldProperty;
 import cn.wuxia.project.weixin.message.SendRemindMessageException;
 import cn.wuxia.project.weixin.message.util.WechatTemplateMessageUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotBlank;
+import lombok.Data;
+import javax.validation.constraints.NotBlank;
 
-import cn.wuxia.project.common.bean.SimpleFieldProperty;
-import cn.wuxia.common.entity.ValidationEntity;
+import java.util.LinkedList;
 
+@Data
 public class BasicMessageTemplateBean extends ValidationEntity {
 
     /**
@@ -37,7 +38,7 @@ public class BasicMessageTemplateBean extends ValidationEntity {
     public String mobile;
 
     /**
-     *  标题
+     * 标题
      */
     @NotBlank
     private String title;
@@ -57,77 +58,6 @@ public class BasicMessageTemplateBean extends ValidationEntity {
      */
     private String detaillink;
 
-    public String getOpenid() {
-        return openid;
-    }
-
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getDetaillink() {
-        return detaillink;
-    }
-
-    public void setDetaillink(String detaillink) {
-        this.detaillink = detaillink;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getWxtemplateid() {
-        return wxtemplateid;
-    }
-
-    public void setWxtemplateid(String wxtemplateid) {
-        this.wxtemplateid = wxtemplateid;
-    }
-
-    public LinkedList<SimpleFieldProperty> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(LinkedList<SimpleFieldProperty> properties) {
-        this.properties = properties;
-    }
 
     public void addProperty(SimpleFieldProperty property) {
         if (ListUtil.isEmpty(this.properties)) {

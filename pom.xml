@@ -5,14 +5,14 @@
     <parent>
         <groupId>cn.wuxia.project</groupId>
         <artifactId>wuxia.project-parent</artifactId>
-        <version>2.3.0</version>
+        <version>2.4.0</version>
     </parent>
     <groupId>cn.wuxia.project</groupId>
     <artifactId>wuxia.project-weixin</artifactId>
     <name>Project Weixin</name>
-    <version>${project.parent.version}</version>
+    <version>2.4.0</version>
     <properties>
-        <wuxia-weixin-api.version>2.3.8</wuxia-weixin-api.version>
+        <wuxia-weixin-api.version>2.4.0</wuxia-weixin-api.version>
     </properties>
     <packaging>jar</packaging>
     <url>https://github.com/wuxiatech/wuxia-project-weixin.git</url>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>cn.wuxia.project</groupId>
             <artifactId>wuxia.project-core</artifactId>
-            <version>[2.3.0,)</version>
+            <version>[2.4.0,)</version>
         </dependency>
         <dependency>
             <groupId>cn.wuxia.common</groupId>
