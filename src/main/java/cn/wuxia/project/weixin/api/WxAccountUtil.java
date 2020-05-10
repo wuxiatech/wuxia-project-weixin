@@ -83,7 +83,10 @@ public abstract class WxAccountUtil {
                 return new PayAccount(account, properties.getProperty(set.getKey() + ".PARNER"), properties.getProperty(set.getKey() + ".API_KEY"));
             }
         }
-        AuthorizerAccount authorizerAccount = authorizerAccountService.findAuthorizerByAppid(appid);
+        if (getAuthorizerAccountService() == null) {
+            return null;
+        }
+        AuthorizerAccount authorizerAccount = getAuthorizerAccountService().findAuthorizerByAppid(appid);
         if (authorizerAccount != null && StringUtil.isNotBlank(authorizerAccount.getWxpayParner())
                 && StringUtil.isNotBlank(authorizerAccount.getWxpayApikey())) {
             BasicAccount account = new BasicAccount(authorizerAccount.getAuthorizerAppid(), authorizerAccount.getAuthorizerRefreshToken());
@@ -92,7 +95,19 @@ public abstract class WxAccountUtil {
         return null;
     }
 
-    private static AuthorizerAccountService authorizerAccountService = SpringContextHolder.getBean(AuthorizerAccountService.class);
+    private static AuthorizerAccountService authorizerAccountService;
+
+    private static AuthorizerAccountService getAuthorizerAccountService() {
+        if (authorizerAccountService == null) {
+            try {
+                authorizerAccountService = SpringContextHolder.getBean(AuthorizerAccountService.class);
+            } catch (IllegalStateException e) {
+                logger.warn("", e);
+            }
+        }
+        return authorizerAccountService;
+    }
+
 
     /**
      * 根据appid查找Account
@@ -109,7 +124,10 @@ public abstract class WxAccountUtil {
                 return account;
             }
         }
-        AuthorizerAccount authorizerAccount = authorizerAccountService.findAuthorizerByAppid(appid);
+        if (getAuthorizerAccountService() == null) {
+            return null;
+        }
+        AuthorizerAccount authorizerAccount = getAuthorizerAccountService().findAuthorizerByAppid(appid);
         if (authorizerAccount != null) {
             BasicAccount account = new BasicAccount(authorizerAccount.getAuthorizerAppid(), authorizerAccount.getAuthorizerRefreshToken());
             return new Account(account, authorizerAccount.getAuthorizerAppid(), authorizerAccount.getUserName());
